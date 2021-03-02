@@ -47,14 +47,22 @@ public class Client {
             group.shutdownGracefully();
         }
     }
-    public void send(String msg){
-        ByteBuf buf = Unpooled.copiedBuffer(msg.getBytes());
-        channel.writeAndFlush(buf);
-    }
+
     //这是一个Main方法，是程序的入口
     public static void main(String[] args) {
         Client client = new Client();
         client.connect();
+    }
+
+    //发送信息
+    public void send(String msg){
+        ByteBuf buf = Unpooled.copiedBuffer(msg.getBytes());
+        channel.writeAndFlush(buf);
+    }
+
+    //通知服务器client准备关闭
+    public void closeConnect(){
+        this.send("_bye_");
     }
 }
 
@@ -72,7 +80,7 @@ class ClientHandler extends ChannelInboundHandlerAdapter{
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ByteBuf buf = Unpooled.copiedBuffer("You are ready to chat".getBytes());
+        ByteBuf buf = Unpooled.copiedBuffer("Hello".getBytes());
         ctx.writeAndFlush(buf);
     }
 

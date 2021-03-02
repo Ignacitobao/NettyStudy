@@ -5,9 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
-
 import io.netty.channel.nio.NioEventLoopGroup;
-
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.GlobalEventExecutor;
@@ -22,14 +20,14 @@ public class Server {
     //装client的容器
     public static ChannelGroup clients = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    //这是一个Main方法，是程序的入口
-    public static void main(String[] args) {
+
+    public void start() {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);//用于“迎客”的线程池
         EventLoopGroup workerGroup = new NioEventLoopGroup(4);//用于"招待客人"的线程池
 
         ServerBootstrap b = new ServerBootstrap();//辅助启动类
         try {
-            b.group(bossGroup,workerGroup)
+            ChannelFuture f = b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
 
@@ -40,11 +38,13 @@ public class Server {
                         }
                     })
                     .bind(8889)
-                    .sync()
-                    .channel()
+                    .sync();
+
+            ServerFrame.INSTANCE.updateServerMsg("server started");
+            f.channel()
                     .closeFuture()
                     .sync();
-            //System.out.println("Server started");
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -52,7 +52,6 @@ public class Server {
             bossGroup.shutdownGracefully();
         }
     }
-
 }
 
 class IMServerChildHandler extends ChannelInboundHandlerAdapter{
@@ -71,9 +70,12 @@ class IMServerChildHandler extends ChannelInboundHandlerAdapter{
             byte[] bytes = new byte[buf.readableBytes()];
 
             buf.getBytes(buf.readerIndex(), bytes);
-            System.out.println(buf);
-            System.out.println(bytes);
-            System.out.println(new String(bytes));
+            String str = new String(bytes);
+            if(str.equals("_bye_")){
+                System.out.println("Client requests to quit");
+                Server.clients.remove(ctx.channel());
+                ctx.close();
+            }
 
             Server.clients.writeAndFlush(buf);
 
@@ -86,6 +88,7 @@ class IMServerChildHandler extends ChannelInboundHandlerAdapter{
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
+        Server.clients.remove(ctx.channel());//在客户端出现异常的时候，将其从channelgroup中移除
         ctx.close();
     }
 }

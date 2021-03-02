@@ -3,6 +3,8 @@ package com.ignacio.nettystudy.netty.im;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 
 /**
@@ -28,8 +30,16 @@ public class ClientFrame extends Frame {
             public void actionPerformed(ActionEvent e) {
                 //把字符串发送到服务器
                 client.send(tf.getText());
-                ta.setText(ta.getText()+tf.getText());
+                //ta.setText(ta.getText()+tf.getText());
                 tf.setText("");
+            }
+        });
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                client.closeConnect();
+                System.exit(0);
             }
         });
         /*this.setVisible(true);

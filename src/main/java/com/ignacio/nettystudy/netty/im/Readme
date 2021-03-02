@@ -1,0 +1,4 @@
+1.创建client的窗口，client和server
+2.client的窗口clientframe初始化时会创建一个client的对象，并调用client的connect方法，与server建立连接
+3.建立连接后，通过actionPerformed方法，会把输入的内容通过send()方法发送给服务器
+4.服务器接收到内容后，会把内容原封不动地发送给已建立连接（channel）的client，完成各个client之间消息的同步
