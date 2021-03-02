@@ -7,6 +7,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.ReferenceCountUtil;
 
 /**
  * @author ：Ignacito
@@ -69,7 +70,6 @@ class ClientChannelInitializer extends ChannelInitializer<SocketChannel> {
 }
 class ClientHandler extends ChannelInboundHandlerAdapter{
 
-
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         ByteBuf buf = Unpooled.copiedBuffer("You are ready to chat".getBytes());
@@ -79,9 +79,20 @@ class ClientHandler extends ChannelInboundHandlerAdapter{
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = null;
-        buf = (ByteBuf)msg;
-        byte[] bytes = new byte[buf.readableBytes()];
-        buf.getBytes(buf.readerIndex(),bytes);
-        System.out.println(new String(bytes));
+
+        try {
+            buf = (ByteBuf)msg;
+            byte[] bytes = new byte[buf.readableBytes()];
+            buf.getBytes(buf.readerIndex(),bytes);
+            String msgAccepted = new String(bytes);
+            ClientFrame.INSTANCE.updateText(msgAccepted);
+
+            /*System.out.println(new String(bytes));
+            ctx.writeAndFlush(buf);*/
+        } finally {
+            if(buf != null){
+                ReferenceCountUtil.release(buf);
+            }
+        }
     }
 }

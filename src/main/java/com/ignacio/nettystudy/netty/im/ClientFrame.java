@@ -32,8 +32,8 @@ public class ClientFrame extends Frame {
                 tf.setText("");
             }
         });
-        this.setVisible(true);
-        connectToServer();
+        /*this.setVisible(true);
+        connectToServer();*/
     }
 
     private void connectToServer() {
@@ -44,12 +44,14 @@ public class ClientFrame extends Frame {
 
     //这是一个Main方法，是程序的入口
     public static void main(String[] args) {
-        new ClientFrame();
+        ClientFrame frame = ClientFrame.INSTANCE;
+        frame.setVisible(true);
+        frame.connectToServer();
 
 
     }
 
     public void updateText(String msgAccept) {
-       this.ta.setText(ta.getText() + System.getProperty("line.seprarator") + msgAccept);
+       this.ta.setText(ta.getText() + System.getProperty("line.separator") + msgAccept);
     }
 }
