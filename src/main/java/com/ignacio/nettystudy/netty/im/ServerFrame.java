@@ -1,5 +1,7 @@
 package com.ignacio.nettystudy.netty.im;
 
+import sun.applet.resources.MsgAppletViewer;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -37,10 +39,16 @@ public class ServerFrame extends Frame {
         this.taLeft.setText(taLeft.getText() + System.getProperty("line.separator") + msg);
     }
 
+
+
     //这是一个Main方法，是程序的入口
     public static void main(String[] args) {
         ServerFrame serverFrame = ServerFrame.INSTANCE;
         serverFrame.setVisible(true);
         serverFrame.startServer();
+    }
+
+    public void updateClientMsg(String str) {
+        this.taRight.setText(taRight.getText() + System.getProperty("line.separator") + str);
     }
 }

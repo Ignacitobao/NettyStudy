@@ -76,7 +76,7 @@ class IMServerChildHandler extends ChannelInboundHandlerAdapter{
                 Server.clients.remove(ctx.channel());
                 ctx.close();
             }
-
+            ServerFrame.INSTANCE.updateClientMsg(str);
             Server.clients.writeAndFlush(buf);
 
         } finally {

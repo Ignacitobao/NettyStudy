@@ -46,12 +46,6 @@ public class ClientFrame extends Frame {
         connectToServer();*/
     }
 
-    private void connectToServer() {
-        client = new Client();
-        client.connect();
-    }
-
-
     //这是一个Main方法，是程序的入口
     public static void main(String[] args) {
         ClientFrame frame = ClientFrame.INSTANCE;
@@ -59,6 +53,11 @@ public class ClientFrame extends Frame {
         frame.connectToServer();
 
 
+    }
+
+    private void connectToServer() {
+        client = new Client();
+        client.connect();
     }
 
     public void updateText(String msgAccept) {
