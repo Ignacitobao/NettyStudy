@@ -1,5 +1,7 @@
 package com.ignacio.nettystudy.netty.im;
 
+import com.ignacio.nettystudy.netty.im.TankMsg.TankMsg;
+import com.ignacio.nettystudy.netty.im.TankMsg.TankMsgEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -72,7 +74,10 @@ class ClientChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
-        socketChannel.pipeline().addLast(new ClientHandler());
+        socketChannel.pipeline()
+                .addLast(new TankMsgEncoder())
+                .addLast(new ClientHandler());
+
     }
 
 }
@@ -81,7 +86,7 @@ class ClientHandler extends ChannelInboundHandlerAdapter{
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         ByteBuf buf = Unpooled.copiedBuffer("Hello".getBytes());
-        ctx.writeAndFlush(buf);
+        ctx.writeAndFlush(new TankMsg(5,8));
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.ignacio.nettystudy.netty.im;
 
+import com.ignacio.nettystudy.netty.im.TankMsg.TankMsg;
+import com.ignacio.nettystudy.netty.im.TankMsg.TankMsgDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -34,7 +36,9 @@ public class Server {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             ChannelPipeline pipeline = socketChannel.pipeline();
-                            pipeline.addLast(new IMServerChildHandler());
+                            pipeline
+                                    .addLast(new TankMsgDecoder())
+                                    .addLast(new IMServerChildHandler());
                         }
                     })
                     .bind(8889)
@@ -66,18 +70,21 @@ class IMServerChildHandler extends ChannelInboundHandlerAdapter{
         ByteBuf buf = null;
 
         try {
-            buf = (ByteBuf)msg;
-            byte[] bytes = new byte[buf.readableBytes()];
+            TankMsg tankMsg = (TankMsg)msg;
+            System.out.println(tankMsg);
+
+            //buf = (ByteBuf)msg;
+            /*byte[] bytes = new byte[buf.readableBytes()];
 
             buf.getBytes(buf.readerIndex(), bytes);
             String str = new String(bytes);
             if(str.equals("_bye_")){
-                System.out.println("Client requests to quit");
+                ServerFrame.INSTANCE.updateServerMsg("Client requests to quit");
                 Server.clients.remove(ctx.channel());
                 ctx.close();
             }
             ServerFrame.INSTANCE.updateClientMsg(str);
-            Server.clients.writeAndFlush(buf);
+            Server.clients.writeAndFlush(buf);*/
 
         } finally {
             if(buf != null){
